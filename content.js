@@ -628,10 +628,18 @@
       toast._timer = setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    function setFabState(state) {
-      const fab = document.getElementById('gobble-fab');
-      if (!fab) return;
-      switch (state) {
+  // ── FAB state management ───────────────────────────────────────────
+
+  let _fabStateGeneration = 0;
+
+  function setFabState(state) {
+    const gen = ++_fabStateGeneration;
+    const fab = document.getElementById('gobble-fab');
+    if (!fab) return;
+
+    const setState = (s) => {
+      if (gen !== _fabStateGeneration) return; // stale call
+      switch (s) {
         case 'capturing':
           fab.innerHTML = `<svg class="gobble-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="15"/></svg> Capturing…`;
           fab.style.background = 'linear-gradient(135deg, #FF9500, #FF6B00)';
@@ -653,7 +661,10 @@
           `;
           fab.style.background = 'linear-gradient(135deg, #007AFF, #5856D6)';
       }
-    }
+    };
+
+    setState(state);
+  }
 
     function updateFabBadge() {
       chrome.storage.local.get(['gobble_capture_queue'], (res) => {

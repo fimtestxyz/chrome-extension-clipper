@@ -93,14 +93,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     };
 
     forwardToApi(payload).then((result) => {
-      try {
-        sendResponse({ ok: true, sent: result.success, reason: result.reason });
-      } catch (_) {
-        // Tab may have closed before response arrived
+      // Send status update back to content script
+      if (tabInfo?.id) {
+        chrome.tabs.sendMessage(tabInfo.id, {
+          type: 'GOBBLE_CAPTURE_STATUS',
+          status: result.success ? 'sent' : 'failed',
+        }).catch(() => { /* tab may have navigated */ });
       }
     });
 
-    return true; // async response
+    sendResponse({ ok: true, sent: true });
+    return false;
   }
 
   sendResponse({ ok: false });
