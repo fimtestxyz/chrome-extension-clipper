@@ -102,6 +102,11 @@
     $('#pref-abs-url')?.addEventListener('change', (e) => { prefs.absUrl = e.target.checked; });
     $('#pref-default-format')?.addEventListener('change', (e) => { prefs.defaultFormat = e.target.value; });
 
+    // Wire history button
+    document.getElementById('btn-history')?.addEventListener('click', () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('history.html') });
+    });
+
     // Restore pref UI state
     syncPrefUI();
   }
