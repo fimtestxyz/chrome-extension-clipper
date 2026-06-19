@@ -443,6 +443,31 @@
       return false;
     }
 
+    if (message.type === 'GOBBLE_CAPTURE') {
+      try {
+        setFabState('capturing');
+        const result = extract('markdown');
+        sendResponse({ ok: true, content: result.content, meta: result.meta });
+        // Optimistically show success; actual status updated by badge
+        setTimeout(() => setFabState('sent'), 1500);
+        setTimeout(() => setFabState('idle'), 3500);
+      } catch (err) {
+        setFabState('failed');
+        sendResponse({ ok: false, error: err.message });
+        setTimeout(() => setFabState('idle'), 2000);
+      }
+      return true;
+    }
+
+    if (message.type === 'GOBBLE_CAPTURE_STATUS') {
+      setFabState(message.status); // 'sent' or 'failed'
+      if (message.status === 'sent') {
+        setTimeout(() => setFabState('idle'), 2000);
+      }
+      updateFabBadge();
+      return false;
+    }
+
     return false;
   });
 
@@ -603,6 +628,56 @@
       toast._timer = setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
+    function setFabState(state) {
+      const fab = document.getElementById('gobble-fab');
+      if (!fab) return;
+      switch (state) {
+        case 'capturing':
+          fab.innerHTML = `<svg class="gobble-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="15"/></svg> Capturing…`;
+          fab.style.background = 'linear-gradient(135deg, #FF9500, #FF6B00)';
+          break;
+        case 'sent':
+          fab.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Sent`;
+          fab.style.background = 'linear-gradient(135deg, #34C759, #30B350)';
+          break;
+        case 'failed':
+          fab.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg> Failed`;
+          fab.style.background = 'linear-gradient(135deg, #FF3B30, #E0332A)';
+          break;
+        default:
+          fab.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Gobble
+          `;
+          fab.style.background = 'linear-gradient(135deg, #007AFF, #5856D6)';
+      }
+    }
+
+    function updateFabBadge() {
+      chrome.storage.local.get(['gobble_capture_queue'], (res) => {
+        const queue = res.gobble_capture_queue || [];
+        let badge = document.getElementById('gobble-badge');
+        if (queue.length > 0) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.id = 'gobble-badge';
+            badge.style.cssText = 'position:absolute;top:-4px;right:-4px;background:#FF3B30;color:#fff;font-size:10px;font-weight:700;padding:2px 5px;border-radius:10px;min-width:16px;text-align:center;z-index:1;';
+            const fab = document.getElementById('gobble-fab');
+            if (fab) {
+              fab.style.position = 'relative';
+              fab.appendChild(badge);
+            }
+          }
+          badge.textContent = queue.length > 99 ? '99+' : queue.length;
+          badge.style.display = '';
+        } else if (badge) {
+          badge.style.display = 'none';
+        }
+      });
+    }
+
     /** Safely send a message, swallowing "context invalidated" errors. */
     function trySafeSendMessage(msg) {
       try {
@@ -611,6 +686,9 @@
         // Extension context was invalidated (reload, tab navigation, etc.)
       }
     }
+    // Update badge periodically
+    setInterval(updateFabBadge, 30000);
+    updateFabBadge();
   })();
 
 })();
