@@ -52,6 +52,18 @@ async function forwardToApi(payload) {
   }
 }
 
+// ── Helper: Save capture entry to history ────────────────────────────
+
+function saveToHistory(entry) {
+  chrome.storage.local.get(['gobble_history', 'gobble_limits'], (result) => {
+    const history = result.gobble_history || [];
+    history.unshift(entry);
+    const limit = (result.gobble_limits || {}).historyLimit || 200;
+    if (history.length > limit) history.pop();
+    chrome.storage.local.set({ gobble_history: history });
+  });
+}
+
 // ── Capture message handler ──────────────────────────────────────────
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -93,6 +105,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     };
 
     forwardToApi(payload).then((result) => {
+      // Persist to history on both success and failure
+      saveToHistory({
+        id: crypto.randomUUID(),
+        timestamp: payload.timestamp,
+        profile: 'default',
+        status: result.success ? 'sent' : 'pending',
+        tab: payload.tab,
+        payload,
+      });
+
       // Send status update back to content script
       if (tabInfo?.id) {
         chrome.tabs.sendMessage(tabInfo.id, {
@@ -123,12 +145,11 @@ setInterval(async () => {
     try {
       const result = await forwardToApi(item.payload);
       if (result.success) {
-        // Remove from queue on success
-        const updated = await QueueManager.getQueue();
-        const idx = updated.findIndex((i) => i.id === item.id);
-        if (idx !== -1) {
-          updated.splice(idx, 1);
-          await chrome.storage.local.set({ gobble_capture_queue: updated });
+        // Remove from queue on success — filter by ID is safer than splice
+        const q = await QueueManager.getQueue();
+        const filtered = q.filter((i) => i.id !== item.id);
+        if (filtered.length < q.length) {
+          await chrome.storage.local.set({ gobble_capture_queue: filtered });
         }
       } else {
         await QueueManager.markFailed(item.id);

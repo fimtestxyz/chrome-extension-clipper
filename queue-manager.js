@@ -15,7 +15,14 @@ class QueueManager {
 
   async enqueue(payload, maxSizeOverride) {
     const queue = await this.getQueue();
-    const effectiveMax = maxSizeOverride ?? this.maxSize;
+    let effectiveMax = maxSizeOverride ?? this.maxSize;
+
+    // If no explicit override, read from stored limits
+    if (!maxSizeOverride) {
+      const result = await chrome.storage.local.get(['gobble_limits']);
+      const limit = result.gobble_limits?.queueLimit;
+      if (limit && limit > 0) effectiveMax = limit;
+    }
 
     const entry = {
       id: crypto.randomUUID(),
