@@ -62,4 +62,5 @@ class QueueManager {
   }
 }
 
+export { QueueManager };
 export default new QueueManager();
