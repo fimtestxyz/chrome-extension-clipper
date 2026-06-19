@@ -1,0 +1,134 @@
+/* ── Gobble Content Overlay CSS ──────────────────────────────────────
+ * Styles for the floating toolbar that appears on any page when active. */
+
+#gobble-overlay {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2147483647;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+}
+
+#gobble-fab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #007AFF, #5856D6);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(0, 122, 255, 0.35);
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  user-select: none;
+}
+
+#gobble-fab:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 40px rgba(0, 122, 255, 0.45);
+}
+
+#gobble-fab:active {
+  transform: scale(0.97);
+}
+
+#gobble-fab svg {
+  width: 18px;
+  height: 18px;
+}
+
+#gobble-menu {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  width: 220px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  display: none;
+  animation: gobble-fade-in 0.2s ease;
+}
+
+#gobble-menu.open {
+  display: block;
+}
+
+@keyframes gobble-fade-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.gobble-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #1C1C1E;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: left;
+}
+
+.gobble-menu-item:hover {
+  background: rgba(0, 122, 255, 0.1);
+  color: #007AFF;
+}
+
+.gobble-menu-item:active {
+  background: rgba(0, 122, 255, 0.18);
+}
+
+.gobble-menu-item svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.gobble-divider {
+  height: 1px;
+  margin: 4px 12px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Toast notification */
+#gobble-toast {
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  z-index: 2147483647;
+  padding: 8px 16px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+#gobble-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
