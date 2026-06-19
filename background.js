@@ -76,7 +76,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const { extraction, tabInfo } = message.payload;
 
     const payload = {
-      profile: 'default', // resolved via getActiveProfile in forwardToApi
       timestamp: Date.now(),
       tab: {
         id: tabInfo?.id || 0,
@@ -94,7 +93,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     };
 
     forwardToApi(payload).then((result) => {
-      sendResponse({ ok: true, sent: result.success, reason: result.reason });
+      try {
+        sendResponse({ ok: true, sent: result.success, reason: result.reason });
+      } catch (_) {
+        // Tab may have closed before response arrived
+      }
     });
 
     return true; // async response
