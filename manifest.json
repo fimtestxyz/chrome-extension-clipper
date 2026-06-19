@@ -3,6 +3,7 @@
   "name": "Gobble",
   "version": "1.0.0",
   "description": "Capture data from any website with a beautiful, Apple-inspired interface.",
+  "options_page": "options.html",
   "permissions": [
     "activeTab",
     "scripting",
