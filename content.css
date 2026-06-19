@@ -132,3 +132,22 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* FAB spinner animation */
+#gobble-fab .gobble-spinner {
+  animation: gobble-spin 1s linear infinite;
+}
+
+@keyframes gobble-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Queue badge */
+#gobble-badge {
+  display: none;
+}
+
+#gobble-badge:empty {
+  display: none !important;
+}

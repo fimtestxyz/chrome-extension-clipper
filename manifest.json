@@ -3,17 +3,26 @@
   "name": "Gobble",
   "version": "1.0.0",
   "description": "Capture data from any website with a beautiful, Apple-inspired interface.",
+  "options_page": "options.html",
   "permissions": [
     "activeTab",
     "scripting",
     "storage",
-    "downloads"
+    "downloads",
+    "debugger"
   ],
   "host_permissions": [
     "<all_urls>"
   ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": { "default": "Ctrl+B", "mac": "Command+B" },
+      "description": "Capture current page and send to backend"
+    }
+  },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "content_scripts": [
     {

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gobble — History</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #007AFF; --gray: #8E8E93; --gray3: #C7C7CC; --gray5: #E5E5EA;
+      --green: #34C759; --red: #FF3B30; --orange: #FF9500; --bg: #FFFFFF;
+      --bg-secondary: #F2F2F7; --text-primary: #1C1C1E; --text-secondary: #3C3C43;
+      --text-tertiary: #8E8E93; --radius: 12px; --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    }
+    html, body {
+      width: 640px; min-height: 600px; font-family: var(--font); font-size: 13px;
+      color: var(--text-primary); background: var(--bg); padding: 20px;
+    }
+    h1 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+    .toolbar {
+      display: flex; gap: 8px; margin-bottom: 16px; align-items: center;
+    }
+    .toolbar input[type="text"] {
+      flex: 1; padding: 8px 12px; border: 1px solid var(--gray4); border-radius: 8px;
+      font-family: var(--font); font-size: 13px; outline: none;
+    }
+    .toolbar input[type="text"]:focus { border-color: var(--blue); }
+    .toolbar select {
+      padding: 8px 12px; border: 1px solid var(--gray4); border-radius: 8px;
+      font-family: var(--font); font-size: 13px; outline: none; background: var(--bg);
+    }
+    .capture-item {
+      border: 1px solid var(--gray5); border-radius: var(--radius); padding: 12px;
+      margin-bottom: 8px; cursor: pointer; transition: background 0.15s;
+    }
+    .capture-item:hover { background: var(--gray5); }
+    .capture-item.expanded { background: var(--bg-secondary); }
+    .capture-header { display: flex; align-items: center; gap: 8px; }
+    .capture-title { font-weight: 600; font-size: 14px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .capture-url { font-size: 11px; color: var(--text-tertiary); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .capture-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; display: flex; gap: 12px; }
+    .status-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    }
+    .status-badge.sent { background: rgba(52,199,89,0.12); color: var(--green); }
+    .status-badge.failed { background: rgba(255,59,48,0.12); color: var(--red); }
+    .status-badge.pending { background: rgba(255,149,0,0.12); color: var(--orange); }
+    .capture-detail {
+      display: none; margin-top: 12px; padding: 12px; background: var(--gray5);
+      border-radius: 8px; font-family: 'SF Mono', 'Menlo', monospace; font-size: 11px;
+      max-height: 200px; overflow: auto; white-space: pre-wrap; word-break: break-word;
+    }
+    .capture-item.expanded .capture-detail { display: block; }
+    .capture-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .btn {
+      padding: 6px 12px; border: 1px solid var(--gray4); border-radius: 6px;
+      background: var(--bg); font-family: var(--font); font-size: 12px; cursor: pointer;
+    }
+    .btn:hover { background: var(--gray5); }
+    .btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn.danger { color: var(--red); }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-tertiary); }
+    .empty-state p { font-size: 14px; }
+    .footer { margin-top: 16px; display: flex; gap: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Capture History</h1>
+
+  <div class="toolbar">
+    <input type="text" id="search-input" placeholder="Search by title, URL, or profile…">
+    <select id="filter-profile">
+      <option value="">All Profiles</option>
+    </select>
+    <button id="btn-clear-all" class="btn danger">Clear All</button>
+  </div>
+
+  <div id="history-list"></div>
+
+  <div class="footer">
+    <button id="btn-open-options" class="btn">Open Settings</button>
+  </div>
+
+  <script src="history.js"></script>
+</body>
+</html>
