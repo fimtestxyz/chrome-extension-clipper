@@ -86,13 +86,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // New: Handle capture requests from content script
   if (message.type === 'GOBBLE_CAPTURE') {
     const { extraction, tabInfo } = message.payload;
+    const tab = sender.tab || {};
 
     const payload = {
       timestamp: Date.now(),
       tab: {
-        id: tabInfo?.id || 0,
-        title: tabInfo?.title || 'Unknown',
-        url: tabInfo?.url || '',
+        id: tab.id || tabInfo?.id || 0,
+        title: tab.title || tabInfo?.title || 'Unknown',
+        url: tab.url || tabInfo?.url || '',
       },
       content: {
         raw: extraction?.content || '',
@@ -116,8 +117,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
 
       // Send status update back to content script
-      if (tabInfo?.id) {
-        chrome.tabs.sendMessage(tabInfo.id, {
+      const targetTabId = tab.id || tabInfo?.id;
+      if (targetTabId) {
+        chrome.tabs.sendMessage(targetTabId, {
           type: 'GOBBLE_CAPTURE_STATUS',
           status: result.success ? 'sent' : 'failed',
         }).catch(() => { /* tab may have navigated */ });
@@ -159,6 +161,14 @@ setInterval(async () => {
     }
   }
 }, 30000);
+
+// ── Storage change listener ──────────────────────────────────────────
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.gobble_backend_profiles) {
+    console.log('[Gobble] Backend profiles updated, changes take effect immediately');
+  }
+});
 
 // ── Action clicked (popup open via shortcut) ─────────────────────────
 

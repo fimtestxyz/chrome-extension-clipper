@@ -421,6 +421,7 @@
 
   // ── Message listener ───────────────────────────────────────────────
 
+  try {
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message.type === 'GOBBLE_EXTRACT') {
       try {
@@ -470,6 +471,7 @@
 
     return false;
   });
+  } catch (_) { /* Extension context invalidated at injection time */ }
 
   // ── PostMessage bridge (popup ↔ content script) ────────────────────
 
@@ -568,6 +570,17 @@
       const action = item.dataset.action;
       menu.classList.remove('open');
 
+      if (action === 'selection') {
+        const text = extractSelection();
+        if (text) {
+          sendCaptureToBackend(text, 'text');
+          showToast('Selection captured ✓');
+        } else {
+          showToast('No text selected');
+        }
+        return;
+      }
+
       downloadExtraction(action);
     });
 
@@ -609,6 +622,8 @@
         a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 5000);
         showToast('Downloaded ✓');
+
+        sendCaptureToBackend(result.content, format, result.meta);
       } catch (err) {
         showToast('Error: ' + err.message);
         console.error('Gobble download:', err);
@@ -626,6 +641,19 @@
       toast.classList.add('show');
       clearTimeout(toast._timer);
       toast._timer = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function sendCaptureToBackend(content, format, meta) {
+      trySafeSendMessage({
+        type: 'GOBBLE_CAPTURE',
+        payload: {
+          extraction: { content, format },
+          tabInfo: {
+            title: meta?.title || document.title,
+            url: meta?.url || window.location.href,
+          },
+        },
+      });
     }
 
   // ── FAB state management ───────────────────────────────────────────
@@ -667,38 +695,57 @@
   }
 
     function updateFabBadge() {
-      chrome.storage.local.get(['gobble_capture_queue'], (res) => {
-        const queue = res.gobble_capture_queue || [];
-        let badge = document.getElementById('gobble-badge');
-        if (queue.length > 0) {
-          if (!badge) {
-            badge = document.createElement('span');
-            badge.id = 'gobble-badge';
-            badge.style.cssText = 'position:absolute;top:-4px;right:-4px;background:#FF3B30;color:#fff;font-size:10px;font-weight:700;padding:2px 5px;border-radius:10px;min-width:16px;text-align:center;z-index:1;';
-            const fab = document.getElementById('gobble-fab');
-            if (fab) {
-              fab.style.position = 'relative';
-              fab.appendChild(badge);
+      if (!chrome.storage?.local) return;
+      try {
+        chrome.storage.local.get(['gobble_capture_queue'], (res) => {
+          try {
+            if (chrome.runtime.lastError) return;
+            const queue = res.gobble_capture_queue || [];
+            let badge = document.getElementById('gobble-badge');
+            if (queue.length > 0) {
+              if (!badge) {
+                badge = document.createElement('span');
+                badge.id = 'gobble-badge';
+                badge.style.cssText = 'position:absolute;top:-4px;right:-4px;background:#FF3B30;color:#fff;font-size:10px;font-weight:700;padding:2px 5px;border-radius:10px;min-width:16px;text-align:center;z-index:1;';
+                const fab = document.getElementById('gobble-fab');
+                if (fab) {
+                  fab.style.position = 'relative';
+                  fab.appendChild(badge);
+                }
+              }
+              badge.textContent = queue.length > 99 ? '99+' : queue.length;
+              badge.style.display = '';
+            } else if (badge) {
+              badge.style.display = 'none';
             }
-          }
-          badge.textContent = queue.length > 99 ? '99+' : queue.length;
-          badge.style.display = '';
-        } else if (badge) {
-          badge.style.display = 'none';
-        }
-      });
+          } catch (_) {}
+        });
+      } catch (_) {
+        // Extension context invalidated
+      }
     }
 
     /** Safely send a message, swallowing "context invalidated" errors. */
     function trySafeSendMessage(msg) {
       try {
-        chrome.runtime.sendMessage(msg);
+        chrome.runtime.sendMessage(msg, (response) => {
+          try {
+            if (chrome.runtime.lastError) return;
+            if (response?.ok) showToast('Sent to backend ✓');
+          } catch (_) {}
+        });
       } catch (_) {
         // Extension context was invalidated (reload, tab navigation, etc.)
       }
     }
     // Update badge periodically
-    setInterval(updateFabBadge, 30000);
+    const badgeInterval = setInterval(() => {
+      if (!chrome.storage?.local) {
+        clearInterval(badgeInterval);
+        return;
+      }
+      updateFabBadge();
+    }, 30000);
     updateFabBadge();
   })();
 

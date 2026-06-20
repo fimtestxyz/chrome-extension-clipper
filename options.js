@@ -49,6 +49,7 @@
         <div class="field-row">
           <label>URL</label>
           <input type="url" class="profile-url" value="${escapeHtml(profile.baseUrl || 'http://localhost:6666')}" placeholder="http://localhost:6666">
+          <button class="btn btn-test" data-index="${index}">Test</button>
         </div>
         <div class="field-row">
           <label>Endpoint</label>
@@ -73,6 +74,32 @@
         const idx = parseInt(btn.dataset.index, 10);
         profiles.splice(idx, 1);
         renderProfiles();
+      });
+    });
+
+    // Wire test buttons
+    profilesList.querySelectorAll('.btn-test').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const card = btn.closest('.profile-card');
+        const urlInput = card.querySelector('.profile-url');
+        const baseUrl = (urlInput.value || '').replace(/\/$/, '');
+        btn.disabled = true;
+        btn.textContent = '...';
+        try {
+          const res = await fetch(baseUrl, { method: 'GET', mode: 'cors' });
+          btn.textContent = `OK ${res.status}`;
+          btn.classList.add('success');
+          btn.classList.remove('error');
+        } catch (e) {
+          btn.textContent = 'Fail';
+          btn.classList.add('error');
+          btn.classList.remove('success');
+        }
+        btn.disabled = false;
+        setTimeout(() => {
+          btn.textContent = 'Test';
+          btn.classList.remove('success', 'error');
+        }, 3000);
       });
     });
   }
