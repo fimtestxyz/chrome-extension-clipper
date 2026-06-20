@@ -33,27 +33,42 @@
 
   function renderProfiles() {
     profilesList.innerHTML = '';
+
+    const countEl = document.getElementById('profile-count');
+    if (countEl) {
+      countEl.textContent = `${profiles.length} profile${profiles.length !== 1 ? 's' : ''}`;
+    }
+
+    if (profiles.length === 0) {
+      profilesList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔗</div>No backend profiles configured yet.</div>';
+      return;
+    }
+
     profiles.forEach((profile, index) => {
       const card = document.createElement('div');
       card.className = 'profile-card';
       card.innerHTML = `
         <div class="profile-header">
+          <div class="profile-status-dot ${profile.enabled ? 'active' : ''}" data-index="${index}"></div>
           <input class="profile-name" type="text" value="${escapeHtml(profile.name || 'Unnamed')}" placeholder="Profile name">
-          <div class="radio-group">
-            <input type="radio" name="default-profile" value="${index}" ${profile.default ? 'checked' : ''} title="Default profile">
-            <span style="font-size:11px;color:var(--text-tertiary)">Default</span>
-          </div>
+          ${profile.default ? '<span class="profile-badge">Default</span>' : ''}
           <div class="toggle-switch ${profile.enabled ? 'active' : ''}" data-index="${index}"></div>
-          <button class="btn btn-sm danger btn-delete" data-index="${index}">&#x2715;</button>
         </div>
         <div class="field-row">
           <label>URL</label>
           <input type="url" class="profile-url" value="${escapeHtml(profile.baseUrl || 'http://localhost:6666')}" placeholder="http://localhost:6666">
-          <button class="btn btn-test" data-index="${index}">Test</button>
+          <button class="btn btn-sm btn-test" data-index="${index}">Test</button>
         </div>
         <div class="field-row">
           <label>Endpoint</label>
           <input type="text" class="profile-endpoint" value="${escapeHtml(profile.endpoint || '/capture')}" placeholder="/capture">
+        </div>
+        <div class="card-actions">
+          <label class="radio-item">
+            <input type="radio" name="default-profile" value="${index}" ${profile.default ? 'checked' : ''}>
+            <label>Set as default</label>
+          </label>
+          <button class="btn btn-sm danger btn-delete" data-index="${index}">Remove</button>
         </div>
       `;
       profilesList.appendChild(card);
@@ -143,7 +158,7 @@
     btnSave.textContent = 'Saved ✓';
     btnSave.disabled = true;
     setTimeout(() => {
-      btnSave.textContent = 'Save';
+      btnSave.textContent = 'Save Changes';
       btnSave.disabled = false;
     }, 2000);
   });

@@ -57,7 +57,7 @@
     filtered.sort((a, b) => b.timestamp - a.timestamp);
 
     if (filtered.length === 0) {
-      historyList.innerHTML = '<div class="empty-state"><p>No captures yet.</p></div>';
+      historyList.innerHTML = '<div class="empty-state"><p>No captures yet.</p><small>Start capturing pages to see them here.</small></div>';
       return;
     }
 

@@ -6,94 +6,517 @@
   <title>Gobble — Settings</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --blue: #007AFF; --gray: #8E8E93; --gray3: #C7C7CC; --gray5: #E5E5EA;
-      --green: #34C759; --red: #FF3B30; --bg: #FFFFFF; --text-primary: #1C1C1E;
-      --text-secondary: #3C3C43; --text-tertiary: #8E8E93; --radius: 12px;
-      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      --teal: #1FB5B8;
+      --deep-ocean: #073B4C;
+      --data-mint: #8EE3E1;
+      --warm-cream: #F8F5EC;
+      --pure-white: #FFFFFF;
+      --light-gray: #EEF2F3;
+      --dark-gray: #2E3438;
+      --michelin-gold: #F4C542;
+      --insight-coral: #FF8B6B;
+
+      --accent: var(--teal);
+      --accent-hover: var(--deep-ocean);
+      --accent-light: var(--data-mint);
+      --accent-bg: rgba(31, 181, 184, 0.1);
+      --accent-bg-hover: rgba(31, 181, 184, 0.15);
+      --success: var(--teal);
+      --danger: var(--insight-coral);
+      --warning: var(--michelin-gold);
+
+      --bg-app: var(--warm-cream);
+      --bg-card: var(--pure-white);
+      --bg-input: var(--light-gray);
+
+      --border: var(--light-gray);
+      --border-focus: var(--accent);
+
+      --text-primary: var(--dark-gray);
+      --text-secondary: #5E6B73;
+      --text-tertiary: #8E9B9F;
+
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.04);
+      --shadow: 0 4px 20px rgba(0,0,0,0.05);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+      --shadow-teal: 0 2px 8px rgba(31, 181, 184, 0.2);
+
+      --radius-sm: 12px;
+      --radius: 16px;
+      --radius-lg: 24px;
+
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', Roboto, sans-serif;
     }
+
     html, body {
-      width: 480px; min-height: 600px; font-family: var(--font); font-size: 13px;
-      color: var(--text-primary); background: var(--bg); padding: 20px;
+      width: 540px;
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text-primary);
+      background: var(--bg-app);
     }
-    h1 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
-    h2 { font-size: 13px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 0 12px; }
+
+    body {
+      min-height: 600px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 32px;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-light), var(--accent));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+      box-shadow: var(--shadow-teal);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 28px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .section-count {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    /* Profile Card */
+    .profile-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     .profile-card {
-      border: 1px solid var(--gray5); border-radius: var(--radius); padding: 16px;
-      margin-bottom: 12px; background: var(--bg);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .profile-card .profile-header {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+
+    .profile-card:hover {
+      box-shadow: var(--shadow);
+      border-color: var(--accent-light);
     }
-    .profile-card .profile-name {
-      font-size: 15px; font-weight: 600; flex: 1; border: none; outline: none;
-      font-family: var(--font); color: var(--text-primary);
+
+    .profile-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--accent-light), var(--accent));
+      opacity: 0;
+      transition: opacity 0.2s;
     }
-    .profile-card .profile-name::placeholder { color: var(--gray3); }
+
+    .profile-card:hover::before {
+      opacity: 1;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .profile-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+
+    .profile-status-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(13, 148, 136, 0.4);
+    }
+
+    .profile-name {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: var(--font);
+      color: var(--text-primary);
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+
+    .profile-name:focus {
+      background: var(--bg-input);
+    }
+
+    .profile-name::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .profile-badge {
+      padding: 3px 8px;
+      background: var(--accent-bg);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Fields */
     .field-row {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
     }
+
+    .field-row:last-child {
+      margin-bottom: 0;
+    }
+
     .field-row label {
-      font-size: 12px; color: var(--text-tertiary); width: 60px; flex-shrink: 0;
+      font-size: 12px;
+      color: var(--text-secondary);
+      width: 70px;
+      flex-shrink: 0;
+      font-weight: 500;
     }
-    .field-row input {
-      flex: 1; padding: 6px 10px; border: 1px solid var(--gray4); border-radius: 6px;
-      font-family: var(--font); font-size: 13px; outline: none;
+
+    .field-row input[type="text"],
+    .field-row input[type="url"],
+    .field-row input[type="number"] {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+      background: var(--bg-input);
+      transition: all 0.15s;
     }
-    .field-row input:focus { border-color: var(--blue); }
-    /* iOS toggle */
+
+    .field-row input:focus {
+      border-color: var(--border-focus);
+      background: var(--bg-card);
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+
+    .field-row input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .limit-input {
+      width: 100px;
+    }
+
+    /* Toggle */
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .toggle-switch {
-      position: relative; width: 40px; height: 24px; border-radius: 12px;
-      background: var(--gray3); cursor: pointer; transition: background 0.2s;
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--text-tertiary);
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .toggle-switch.active { background: var(--green); }
+
+    .toggle-switch.active {
+      background: var(--accent);
+    }
+
     .toggle-switch::after {
-      content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
-      border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-      transition: transform 0.2s;
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      transition: transform 0.2s ease;
     }
-    .toggle-switch.active::after { transform: translateX(16px); }
+
+    .toggle-switch.active::after {
+      transform: translateX(20px);
+    }
+
+    .toggle-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Radio */
+    .radio-group {
+      display: flex;
+      gap: 16px;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .radio-item input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .radio-item label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    /* Buttons */
     .btn {
-      padding: 8px 16px; border: 1px solid var(--gray4); border-radius: 8px;
-      background: var(--bg); font-family: var(--font); font-size: 13px;
-      cursor: pointer; transition: all 0.15s;
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: var(--shadow-sm);
     }
-    .btn:hover { background: var(--gray5); }
-    .btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
-    .btn.primary:hover { background: #0066D6; }
-    .btn.danger { color: var(--red); }
-    .btn.danger:hover { background: rgba(255,59,48,0.08); }
-    .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
-    .actions { display: flex; gap: 8px; margin-top: 16px; }
-    .radio-group { display: flex; align-items: center; gap: 6px; }
-    .radio-group input[type="radio"] { accent-color: var(--blue); }
-    .limit-input { width: 80px; }
+
+    .btn:hover {
+      background: var(--bg-input);
+      border-color: var(--text-tertiary);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      box-shadow: var(--shadow-teal);
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35);
+    }
+
+    .btn.danger {
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .btn.danger:hover {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: var(--danger);
+    }
+
+    .btn.ghost {
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .btn.ghost:hover {
+      background: var(--bg-input);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
     .btn-test {
-      padding: 6px 12px; font-size: 12px; white-space: nowrap; flex-shrink: 0;
+      flex-shrink: 0;
+      min-width: 60px;
     }
-    .btn-test.success { color: var(--green); border-color: var(--green); }
-    .btn-test.error { color: var(--red); border-color: var(--red); }
+
+    .btn-test.success {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-bg);
+    }
+
+    .btn-test.error {
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .btn-add {
+      width: 100%;
+      padding: 12px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-add:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-bg);
+    }
+
+    /* Card Actions */
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    /* Actions Row */
+    .actions-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 8px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--text-tertiary);
+      font-size: 13px;
+    }
+
+    .empty-state-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+      opacity: 0.5;
+    }
   </style>
 </head>
 <body>
-  <h1>Gobble Settings</h1>
+  <header class="header">
+    <div class="logo-row">
+      <div class="logo">G</div>
+      <div>
+        <h1>Gobble</h1>
+        <p class="subtitle">Smart content capture for your workflow</p>
+      </div>
+    </div>
+  </header>
 
-  <h2>Backend Profiles</h2>
-  <div id="profiles-list"></div>
-  <button id="btn-add-profile" class="btn">+ Add Profile</button>
+  <section class="section">
+    <div class="section-header">
+      <h2>Backend Profiles</h2>
+      <span class="section-count" id="profile-count">0 profiles</span>
+    </div>
+    <div id="profiles-list" class="profile-list"></div>
+    <button id="btn-add-profile" class="btn-add">
+      + Add New Profile
+    </button>
+  </section>
 
-  <h2>Queue &amp; History</h2>
-  <div class="field-row">
-    <label>Queue Size</label>
-    <input type="number" id="pref-queue-limit" class="limit-input" value="200" min="10" max="1000">
-  </div>
-  <div class="field-row">
-    <label>History Size</label>
-    <input type="number" id="pref-history-limit" class="limit-input" value="200" min="10" max="1000">
-  </div>
+  <section class="section">
+    <div class="section-header">
+      <h2>Queue &amp; History</h2>
+    </div>
 
-  <div class="actions">
-    <button id="btn-save" class="btn primary">Save</button>
+    <div class="field-row">
+      <label>Queue Limit</label>
+      <input type="number" id="pref-queue-limit" class="limit-input" value="200" min="10" max="1000">
+    </div>
+
+    <div class="field-row">
+      <label>History Limit</label>
+      <input type="number" id="pref-history-limit" class="limit-input" value="200" min="10" max="1000">
+    </div>
+  </section>
+
+  <div class="actions-row">
+    <button id="btn-save" class="btn primary">Save Changes</button>
   </div>
 
   <script src="options.js"></script>
