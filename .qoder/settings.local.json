@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /Volumes/wwk_nvme/Users/wwkoon/.openclaw/workspace/chrome_extension_clipper && git diff)",
+      "Bash(cd /Volumes/wwk_nvme/Users/wwkoon/.openclaw/workspace/chrome_extension_clipper && git diff -- popup.html && echo \"---\" && git diff --cached --stat)",
+      "Bash(cd /Volumes/wwk_nvme/Users/wwkoon/.openclaw/workspace/chrome_extension_clipper && git diff --stat)",
+      "Bash(brew install:*)",
+      "Bash(git:*)",
+      "Bash(git commit -m \"$\\(cat <<'EOF'\nfix: improve options/history/popup UI, guard chrome API calls against context invalidation\nEOF\n\\)\")",
+      "Bash(gh auth status 2>&1 | head -5)",
+      "Bash(gh auth setup-git && git push origin master)",
+      "Bash(GIT_TERMINAL_PROMPT=0 git -c credential.helper='!gh auth git-credential' push origin master)"
+    ]
+  }
+}

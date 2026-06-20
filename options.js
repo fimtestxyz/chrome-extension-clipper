@@ -97,23 +97,35 @@
       btn.addEventListener('click', async () => {
         const card = btn.closest('.profile-card');
         const urlInput = card.querySelector('.profile-url');
-        const baseUrl = (urlInput.value || '').replace(/\/$/, '');
+        const epInput = card.querySelector('.profile-endpoint');
+        let baseUrl = (urlInput.value || '').replace(/\/$/, '');
+        let endpoint = (epInput.value || '/capture').replace(/\/$/, '');
+        if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
+        const url = baseUrl + endpoint;
+
         btn.disabled = true;
         btn.textContent = '...';
+        btn.classList.remove('success', 'warn', 'error');
         try {
-          const res = await fetch(baseUrl, { method: 'GET', mode: 'cors' });
-          btn.textContent = `OK ${res.status}`;
-          btn.classList.add('success');
-          btn.classList.remove('error');
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ test: true, timestamp: Date.now() }),
+          });
+          btn.textContent = `${res.status}`;
+          if (res.ok) {
+            btn.classList.add('success');
+          } else {
+            btn.classList.add('warn');
+          }
         } catch (e) {
-          btn.textContent = 'Fail';
+          btn.textContent = 'Offline';
           btn.classList.add('error');
-          btn.classList.remove('success');
         }
         btn.disabled = false;
         setTimeout(() => {
           btn.textContent = 'Test';
-          btn.classList.remove('success', 'error');
+          btn.classList.remove('success', 'warn', 'error');
         }, 3000);
       });
     });

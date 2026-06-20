@@ -687,7 +687,7 @@
             </svg>
             Gobble
           `;
-          fab.style.background = 'linear-gradient(135deg, #007AFF, #5856D6)';
+          fab.style.background = 'linear-gradient(135deg, #1FB5B8, #073B4C)';
       }
     };
 
